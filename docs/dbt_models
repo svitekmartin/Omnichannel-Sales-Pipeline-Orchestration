@@ -1,0 +1,35 @@
+## Data Transformation Steps (dbt Models)
+
+### 1) Staging Layer (`models/staging/`)
+
+**Goal:** Normalize raw sources and apply light cleaning.
+
+-   **`stg_walmart.sql`** – Cleans base fields and standardizes column names (e.g., `snake_case`) from the Walmart raw feed.
+    
+-   **`shopify_orders_with_full_categories.sql`** – Selects all Shopify order fields and adds `full_category_name` by expanding abbreviated `CATEGORY` values.
+    
+
+----------
+
+### 2) Intermediate Layer (`models/intermediate/`)
+
+**Goal:** Apply business rules, filtering, and derived metrics.
+
+-   **`shopify_matched_products.sql`** – Keeps only target electronics (`Laptop`, `Headphones`, `Smartphone`, `Tablet`) and computes `total_item_revenue`.
+    
+-   **`walmart_matched_products.sql`** – Filters to the same electronics set, computes `total_item_revenue`, and normalizes `full_category_name` to **`Electronics`** for consistency.
+    
+
+----------
+
+### 3) Analytics Layer (`models/marts/`)
+
+**Goal:** Deliver a unified, BI-ready view.
+
+-   **`unified_sales.sql`** – Core omnichannel mart that `UNION ALL`s the filtered Shopify and Walmart models (executed on **Snowflake**).
+    
+    -   Enforces **aligned schemas and data types** across channels.
+        
+    -   Fills channel-specific gaps with `NULL`s (e.g., `store_id` for Shopify; `customer_age` for Walmart).
+        
+    -   Adds `sales_channel` (`Online` / `Offline`) to enable straightforward cross-channel comparisons.
