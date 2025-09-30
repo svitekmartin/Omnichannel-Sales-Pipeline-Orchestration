@@ -1,14 +1,20 @@
-
 version: 2
 
 sources:
-  - name: retail_data # Logical name for group of sources
-    database: RETAIL_PROJECT # Snowflake database name
-    schema: PUBLIC # Schema where raw tables are located
+  - name: retail_data              # logical source group
+    description: Raw Shopify (online) and Walmart (offline) sales in Snowflake.
+    database: RETAIL_PROJECT       # Snowflake database
+    schema: PUBLIC                 # schema for raw/staged tables
 
     tables:
-      - name: SHOPIFY_ORDERS
-        identifier: SHOPIFY_ORDERS # Optional, if table name matches
+      - name: shopify_orders
+        identifier: SHOPIFY_ORDERS # physical table name
+        description: Shopify e-commerce orders (raw).
 
-      - name: WALMART 
-        identifier: WALMART # Optional, if table name matches
+      - name: walmart
+        identifier: WALMART        # physical table name
+        description: Walmart in-store transactions (raw).
+
+    # freshness:
+    #   warn_after: {count: 24, period: hour}
+    #   error_after: {count: 48, period: hour}
